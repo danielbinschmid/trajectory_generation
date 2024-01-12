@@ -11,6 +11,9 @@
 using namespace std;
 using namespace Eigen;
 
+/**
+ * Generates random N waypoints.
+ **/
 class RandomRouteGenerator
 {
 public:
