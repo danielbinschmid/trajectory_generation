@@ -19,8 +19,6 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(crazyflie_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_ros REQUIRED)
 
 include_directories(
     3rd/eigen# ${EIGEN3_INCLUDE_DIRS}
@@ -33,8 +31,8 @@ install(DIRECTORY
 )
 
 # /usr/local/include
-add_executable(${PROJECT_NAME}_node src/example1_node.cpp)
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp crazyflie_msgs geometry_msgs sensor_msgs)
+add_executable(traj_gen src/traj_gen.cpp)
+ament_target_dependencies(traj_gen rclcpp crazyflie_msgs geometry_msgs sensor_msgs)
 
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
@@ -42,7 +40,7 @@ ament_target_dependencies(${PROJECT_NAME}_node rclcpp crazyflie_msgs geometry_ms
 
 install(
   TARGETS
-  ${PROJECT_NAME}_node
+  traj_gen
   DESTINATION lib/${PROJECT_NAME}
 )
 
