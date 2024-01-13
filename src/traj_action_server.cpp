@@ -65,13 +65,13 @@ void TrajectoryActionServer::execute(const std::shared_ptr<GoalHandleTrajectory>
     const std::vector<float> target_waypoints = goal->target_waypoints;
     const auto target_timestamps = goal->target_timestamps;
     const auto discretization_count = goal->discretization_count;
-    const auto n_target_waypoints = goal->n_target_waypoints;
 
     // convert target waypoints to Eigen matrix
     std::vector<double> target_waypoints_d(target_waypoints.begin(), target_waypoints.end());
     if (target_waypoints_d.size() % 3 != 0) { throw std::runtime_error("Target waypoints vector size is not divisible by 3"); }
-    Eigen::MatrixXd mat = Eigen::Map<Eigen::MatrixXd>(target_waypoints_d.data(), 3, target_waypoints_d.size() / 3);
+    Eigen::MatrixXd target_waypoints_m = Eigen::Map<Eigen::MatrixXd>(target_waypoints_d.data(), 3, target_waypoints_d.size() / 3);
     
+
     auto result = std::make_shared<Trajectory::Result>();
 
     if (goal_handle->is_canceling()) {

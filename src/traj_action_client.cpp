@@ -40,7 +40,6 @@ void TrajectoryActionClient::send_goal()
     goal_msg.target_waypoints = {0, 0, 0, 16, 16, 16};
     goal_msg.target_timestamps = {0, 10};
     goal_msg.discretization_count = 10;
-    goal_msg.n_target_waypoints = 2;
     RCLCPP_INFO(this->get_logger(), "Sending goal");
 
     auto send_goal_options = rclcpp_action::Client<Trajectory>::SendGoalOptions();
