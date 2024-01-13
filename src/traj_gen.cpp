@@ -1,79 +1,63 @@
-#include "lib/traj_min_jerk.hpp"
-#include "lib/traj_min_snap.hpp"
+
 #include "traj_gen.hpp"
 #include "random_route_generator.hpp"
 
-TrajGen::TrajGen() : 
-    Node("traj_gen")
+
+void traj::gen_trajectory_jerk(MatrixXd target_route, VectorXd target_timestamps, min_jerk::Trajectory & min_jerk_trajectory) 
 {
-    this->genTrajectory(); 
-}
-
-void TrajGen::genTrajectory() {
-    RCLCPP_INFO(this->get_logger(), "traj gen start");
-    
-    // CONFIG ----
-    RandomRouteGenerator routeGen(Array3d(-16, -16, -16), Array3d(16, 16, 16));
-    int pieceNumber = 10;
-    
-    // Optimization type
-    OptType optType = OptType::SNAP;
-
-    // Target waypoints
-    MatrixXd route;
-    route = routeGen.generate(pieceNumber);
-
-    // for jerk opt
+    // states
     Matrix3d initialState, finalState;
+
     // Set initial position and final position, and set rest to zero
     initialState.setZero();
     finalState.setZero();
-    initialState.col(0) << route.leftCols<1>();
-    finalState.col(0) << route.rightCols<1>();
+    initialState.col(0) << target_route.leftCols<1>();
+    finalState.col(0) << target_route.rightCols<1>();
 
-    // for snap opt
-    Eigen::Matrix<double, 3, 4> initialStateSnap, finalStateSnap;
-    // set initial and final pos and rest to zero
-    initialStateSnap    << initialState, Eigen::MatrixXd::Zero(3, 1);
-    finalStateSnap      << finalState, Eigen::MatrixXd::Zero(3, 1);
-    
-    VectorXd timestamps;
-    timestamps = allocateTime(route, 3.0, 3.0);
-    // -----------
-    
-    // SETUP -----
-
-    // For aligning prints of Eigen vectors
-    const IOFormat fmt(2, DontAlignCols, "\t", " ", "", "", "", "");
-
+    // optimization class
     min_jerk::JerkOpt jerkOpt;
-    min_jerk::Trajectory minJerkTraj;
 
-    min_snap::SnapOpt snapOpt;
-    min_snap::Trajectory minSnapTraj;
-
-    // -----------
-
-    // GEN ------- 
-    
-    // target waypoints in-between first and final position 
-    auto pointsBetween = route.block(0, 1, 3, pieceNumber - 1);
-
-    jerkOpt.reset(initialState, finalState, route.cols() - 1);
-    jerkOpt.generate(pointsBetween, timestamps);
-    jerkOpt.getTraj(minJerkTraj);
-
-    snapOpt.reset(initialStateSnap, finalStateSnap, route.cols() - 1);
-    snapOpt.generate(pointsBetween, timestamps);
-    snapOpt.getTraj(minSnapTraj);
-    // -----------
-    
-    // LOG -------
-    RCLCPP_INFO(this->get_logger(), "traj gen end");
-    // -----------
+    // generate trajectory
+    auto pointsBetween = target_route.block(0, 1, 3, target_route.cols() - 1);
+    jerkOpt.reset(initialState, finalState, target_route.cols() - 1);
+    jerkOpt.generate(pointsBetween, target_timestamps);
+    jerkOpt.getTraj(min_jerk_trajectory);
 }
 
-VectorXd allocateTime(const MatrixXd &wayPs,
+void traj::gen_trajectory_snap(MatrixXd target_route, VectorXd target_timestamps, min_snap::Trajectory & min_snap_trajectory) {
+    // states
+    Eigen::Matrix<double, 3, 4> initialStateSnap, finalStateSnap;
+
+    // Set initial position and final position, and set rest to zero
+    initialStateSnap.setZero();
+    finalStateSnap.setZero();
+    initialStateSnap.col(0) << target_route.leftCols<1>();
+    finalStateSnap.col(0) << target_route.rightCols<1>();
+
+    // optimization class
+    min_snap::SnapOpt snap_opt;
+
+    // generate trajectory
+    auto pointsBetween = target_route.block(0, 1, 3, target_route.cols() - 1);
+    snap_opt.reset(initialStateSnap, finalStateSnap, target_route.cols() - 1);
+    snap_opt.generate(pointsBetween, target_timestamps);
+    snap_opt.getTraj(min_snap_trajectory);
+}
+
+void traj::gen_trajectory(MatrixXd target_route, VectorXd target_timestamps, OptType opt_type, min_jerk::Trajectory & min_jerk_trajectory , min_snap::Trajectory & min_snap_trajectory) {
+    switch (opt_type) {
+        case traj::OptType::JERK:
+            traj::gen_trajectory_jerk(target_route, target_timestamps, min_jerk_trajectory);
+            break;
+        case traj::OptType::SNAP:
+            traj::gen_trajectory_snap(target_route, target_timestamps, min_snap_trajectory);
+            break;
+        default: 
+            return;
+    }
+}
+
+VectorXd traj::allocateTime(const MatrixXd &wayPs,
                       double vel,
                       double acc)
 {
@@ -114,12 +98,4 @@ VectorXd allocateTime(const MatrixXd &wayPs,
     }
 
     return durations;
-}
-
-int main(int argc, char** argv) 
-{
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<TrajGen>());
-    rclcpp::shutdown();
-    return 0;
 }

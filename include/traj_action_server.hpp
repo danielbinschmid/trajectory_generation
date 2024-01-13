@@ -6,7 +6,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
-
+#include "traj_gen.hpp"
 #include "action/visibility_control.h"
 
 class TrajectoryActionServer : public rclcpp::Node
@@ -16,10 +16,12 @@ public:
   using GoalHandleTrajectory = rclcpp_action::ServerGoalHandle<Trajectory>;
 
   ACTION_TUTORIALS_CPP_PUBLIC
-  explicit TrajectoryActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
+  explicit TrajectoryActionServer(const rclcpp::NodeOptions & options);
 
 private:
   rclcpp_action::Server<Trajectory>::SharedPtr action_server_;
+
+  traj::OptType opt_type;
 
   rclcpp_action::GoalResponse handle_goal(
     const rclcpp_action::GoalUUID & uuid,

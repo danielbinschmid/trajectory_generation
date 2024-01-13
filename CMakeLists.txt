@@ -24,7 +24,7 @@ find_package(rclcpp_components REQUIRED)
 
 
 add_library(action_server SHARED
-  src/traj_action_server.cpp)
+  src/traj_action_server.cpp src/traj_gen.cpp)
 target_include_directories(action_server PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
@@ -43,7 +43,7 @@ install(TARGETS
   RUNTIME DESTINATION bin)
 
 add_library(action_client SHARED
-src/action_client.cpp)
+src/traj_action_client.cpp)
 target_include_directories(action_client PRIVATE
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
@@ -73,8 +73,8 @@ install(DIRECTORY
 )
 
 # /usr/local/include
-add_executable(traj_gen src/traj_gen.cpp)
-ament_target_dependencies(traj_gen rclcpp crazyflie_msgs geometry_msgs sensor_msgs)
+# add_executable(traj_gen src/traj_gen.cpp)
+# ament_target_dependencies(traj_gen rclcpp crazyflie_msgs geometry_msgs sensor_msgs)
 
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
@@ -82,7 +82,7 @@ ament_target_dependencies(traj_gen rclcpp crazyflie_msgs geometry_msgs sensor_ms
 
 install(
   TARGETS
-  traj_gen
+  # traj_gen
   DESTINATION lib/${PROJECT_NAME}
 )
 

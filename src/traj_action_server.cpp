@@ -1,11 +1,12 @@
 #include <functional>
 #include <memory>
 #include <thread>
-
+#include <stdexcept>
 #include "crazyflie_msgs/action/trajectory.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+#include <Eigen/Eigen>
 
 #include "action/visibility_control.h"
 #include "traj_action_server.hpp"
@@ -21,6 +22,8 @@ TrajectoryActionServer::TrajectoryActionServer(const rclcpp::NodeOptions & optio
         std::bind(&TrajectoryActionServer::handle_goal, this, _1, _2),
         std::bind(&TrajectoryActionServer::handle_cancel, this, _1),
         std::bind(&TrajectoryActionServer::handle_accepted, this, _1));
+    
+    this->opt_type = traj::OptType::SNAP;
 }
 
 
@@ -59,10 +62,16 @@ void TrajectoryActionServer::execute(const std::shared_ptr<GoalHandleTrajectory>
     feedback_msg = "Started trajectory generation.";
     goal_handle->publish_feedback(feedback);
 
-    const auto target_waypoints = goal->target_waypoints;
+    const std::vector<float> target_waypoints = goal->target_waypoints;
     const auto target_timestamps = goal->target_timestamps;
     const auto discretization_count = goal->discretization_count;
+    const auto n_target_waypoints = goal->n_target_waypoints;
 
+    // convert target waypoints to Eigen matrix
+    std::vector<double> target_waypoints_d(target_waypoints.begin(), target_waypoints.end());
+    if (target_waypoints_d.size() % 3 != 0) { throw std::runtime_error("Target waypoints vector size is not divisible by 3"); }
+    Eigen::MatrixXd mat = Eigen::Map<Eigen::MatrixXd>(target_waypoints_d.data(), 3, target_waypoints_d.size() / 3);
+    
     auto result = std::make_shared<Trajectory::Result>();
 
     if (goal_handle->is_canceling()) {

@@ -1,41 +1,28 @@
 #pragma once
-
-
-#include "rclcpp/rclcpp.hpp"
+#include "lib/traj_min_jerk.hpp"
+#include "lib/traj_min_snap.hpp"
 #include <Eigen/Eigen>
 
 
 using namespace Eigen;
 
-/**
- * Whether to use JERK or SNAP optimization
- **/
-enum OptType { JERK, SNAP };
-
-/**
- * Generates time stamps for given waypoints given velocity and acceleration.
- **/
-VectorXd allocateTime(const MatrixXd &wayPs,
-                      double vel,
-                      double acc);
-
-/**
- * Ros2 node for trajectory generation.
- **/
-class TrajGen : public rclcpp::Node {
-    
-public:
+namespace traj {
     /**
-     * Initialises the Ros2 node.
+     * Whether to use JERK or SNAP optimization
      **/
-    TrajGen();
-
-private:
+    enum OptType { JERK, SNAP };
 
     /**
-     * Generates a trajectory.
+     * Generates time stamps for given waypoints given velocity and acceleration.
      **/
-    void genTrajectory();
+    VectorXd allocateTime(const MatrixXd &wayPs,
+                        double vel,
+                        double acc);
 
-    
-};
+    void gen_trajectory_jerk(MatrixXd target_route, VectorXd target_timestamps, min_jerk::Trajectory & min_jerk_trajectory);
+
+    void gen_trajectory_snap(MatrixXd target_route, VectorXd target_timestamps, min_snap::Trajectory & min_snap_trajectory);
+
+    void gen_trajectory(MatrixXd target_route, VectorXd target_timestamps, OptType opt_type, min_jerk::Trajectory & min_jerk_trajectory , min_snap::Trajectory & min_snap_trajectory);
+
+}
