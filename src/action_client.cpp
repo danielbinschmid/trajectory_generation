@@ -9,15 +9,9 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+#include "traj_action_client.hpp"
 
-
-class TrajectoryActionClient : public rclcpp::Node
-{
-public:
-  using Trajectory = crazyflie_msgs::action::Trajectory;
-  using GoalHandleTrajectory = rclcpp_action::ClientGoalHandle<Trajectory>;
-
-  explicit TrajectoryActionClient(const rclcpp::NodeOptions & options)
+TrajectoryActionClient::TrajectoryActionClient(const rclcpp::NodeOptions & options)
   : Node("trajectory_action_client", options)
   {
     this->client_ptr_ = rclcpp_action::create_client<Trajectory>(
@@ -29,7 +23,7 @@ public:
       std::bind(&TrajectoryActionClient::send_goal, this));
   }
 
-  void send_goal()
+void TrajectoryActionClient::send_goal()
   {
     using namespace std::placeholders;
 
@@ -59,11 +53,8 @@ public:
     this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
   }
 
-private:
-  rclcpp_action::Client<Trajectory>::SharedPtr client_ptr_;
-  rclcpp::TimerBase::SharedPtr timer_;
 
-  void goal_response_callback(std::shared_future<GoalHandleTrajectory::SharedPtr> future)
+  void TrajectoryActionClient::goal_response_callback(std::shared_future<GoalHandleTrajectory::SharedPtr> future)
   {
     auto goal_handle = future.get();
     if (!goal_handle) {
@@ -73,14 +64,14 @@ private:
     }
   }
 
-  void feedback_callback(
+  void TrajectoryActionClient::feedback_callback(
     GoalHandleTrajectory::SharedPtr,
     const std::shared_ptr<const Trajectory::Feedback> feedback)
   {
     RCLCPP_INFO(this->get_logger(), "Feedback received: %s", feedback->message.c_str());
   }
 
-  void result_callback(const GoalHandleTrajectory::WrappedResult & result)
+  void TrajectoryActionClient::result_callback(const GoalHandleTrajectory::WrappedResult & result)
   {
     switch (result.code) {
       case rclcpp_action::ResultCode::SUCCEEDED:
@@ -103,7 +94,5 @@ private:
     RCLCPP_INFO(this->get_logger(), ss.str().c_str());
     rclcpp::shutdown();
   }
-};  // class TrajectoryActionClient
 
 
-RCLCPP_COMPONENTS_REGISTER_NODE(TrajectoryActionClient)

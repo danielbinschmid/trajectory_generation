@@ -24,7 +24,7 @@ find_package(rclcpp_components REQUIRED)
 
 
 add_library(action_server SHARED
-  src/action_server.cpp)
+  src/traj_action_server.cpp)
 target_include_directories(action_server PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
