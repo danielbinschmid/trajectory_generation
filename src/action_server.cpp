@@ -37,7 +37,7 @@ private:
     const rclcpp_action::GoalUUID & uuid,
     std::shared_ptr<const Trajectory::Goal> goal)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal request with order %d", goal->order);
+    RCLCPP_INFO(this->get_logger(), "Received trajectory generation request with %d target waypoints.", goal->n_target_waypoints);
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -60,34 +60,30 @@ private:
   void execute(const std::shared_ptr<GoalHandleTrajectory> goal_handle)
   {
     RCLCPP_INFO(this->get_logger(), "Executing goal");
-    rclcpp::Rate loop_rate(1);
     const auto goal = goal_handle->get_goal();
     auto feedback = std::make_shared<Trajectory::Feedback>();
-    auto & sequence = feedback->partial_sequence;
-    sequence.push_back(0);
-    sequence.push_back(1);
+    auto & feedback_msg = feedback->message;
+
+    // first feedback
+    feedback_msg = "Started trajectory generation.";
+    goal_handle->publish_feedback(feedback);
+
+    const auto target_waypoints = goal->target_waypoints;
+    const auto target_timestamps = goal->target_timestamps;
+    const auto discretization_count = goal->discretization_count;
+
     auto result = std::make_shared<Trajectory::Result>();
 
-    for (int i = 1; (i < goal->order) && rclcpp::ok(); ++i) {
-      // Check if there is a cancel request
-      if (goal_handle->is_canceling()) {
-        result->sequence = sequence;
+    if (goal_handle->is_canceling()) {
+        //result->sequence = sequence;
         goal_handle->canceled(result);
         RCLCPP_INFO(this->get_logger(), "Goal canceled");
         return;
-      }
-      // Update sequence
-      sequence.push_back(sequence[i] + sequence[i - 1]);
-      // Publish feedback
-      goal_handle->publish_feedback(feedback);
-      RCLCPP_INFO(this->get_logger(), "Publish feedback");
-
-      loop_rate.sleep();
     }
 
     // Check if goal is done
     if (rclcpp::ok()) {
-      result->sequence = sequence;
+      // result->sequence = sequence;
       goal_handle->succeed(result);
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
     }

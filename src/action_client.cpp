@@ -41,8 +41,12 @@ public:
     }
 
     auto goal_msg = Trajectory::Goal();
-    goal_msg.order = 10;
 
+    // define goal
+    goal_msg.target_waypoints = {0, 0, 0, 16, 16, 16};
+    goal_msg.target_timestamps = {0, 10};
+    goal_msg.discretization_count = 10;
+    goal_msg.n_target_waypoints = 2;
     RCLCPP_INFO(this->get_logger(), "Sending goal");
 
     auto send_goal_options = rclcpp_action::Client<Trajectory>::SendGoalOptions();
@@ -73,12 +77,7 @@ private:
     GoalHandleTrajectory::SharedPtr,
     const std::shared_ptr<const Trajectory::Feedback> feedback)
   {
-    std::stringstream ss;
-    ss << "Next number in sequence received: ";
-    for (auto number : feedback->partial_sequence) {
-      ss << number << " ";
-    }
-    RCLCPP_INFO(this->get_logger(), ss.str().c_str());
+    RCLCPP_INFO(this->get_logger(), "Feedback received: %s", feedback->message.c_str());
   }
 
   void result_callback(const GoalHandleTrajectory::WrappedResult & result)
@@ -98,9 +97,9 @@ private:
     }
     std::stringstream ss;
     ss << "Result received: ";
-    for (auto number : result.result->sequence) {
-      ss << number << " ";
-    }
+    // for (auto number : result.result->sequence) {
+    //   ss << number << " ";
+    // }
     RCLCPP_INFO(this->get_logger(), ss.str().c_str());
     rclcpp::shutdown();
   }
