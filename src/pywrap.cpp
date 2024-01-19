@@ -1,53 +1,34 @@
 #include <Eigen/Dense>
 #include <cmath>
-
-using Eigen::Matrix;
-using Eigen::Dynamic;
-typedef Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic> myMatrix;
-
-class MyClass {
-
-    int N;
-    double a;
-    double b;
-
-public:
-
-    Eigen::VectorXd v_data;
-    Eigen::VectorXd v_gamma;
-
-    MyClass(){}
-    MyClass( double a_in, double b_in, int N_in) 
-    {
-        N = N_in;
-        a = a_in;
-        b = b_in;
-    }
-
-    void run() 
-    { 
-        v_data = Eigen::VectorXd::LinSpaced(N, a, b); 
-
-        auto gammafunc = [](double it) { return std::tgamma(it); };
-        v_gamma = v_data.unaryExpr(gammafunc);
-    }
-
-}; 
-
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
-
+#include <iostream>
 
 namespace py = pybind11;
 constexpr auto byref = py::return_value_policy::reference_internal;
 
-PYBIND11_MODULE(MyLib, m) {
-    m.doc() = "optional module docstring";
+int calc_trajectory(py::array_t<double>& t_waypoints) {
+    if (t_waypoints.ndim() != 2)
+        throw std::runtime_error("Results should be a 2-D Numpy array");
+    auto buf = t_waypoints.request();
+    double* ptr = (double*)buf.ptr;
+    size_t N = t_waypoints.shape()[0];
+    size_t M = t_waypoints.shape()[1];
 
-    py::class_<MyClass>(m, "MyClass")
-    .def(py::init<double, double, int>())  
-    .def("run", &MyClass::run, py::call_guard<py::gil_scoped_release>())
-    .def_readonly("v_data", &MyClass::v_data, byref)
-    .def_readonly("v_gamma", &MyClass::v_gamma, byref)
-    ;
+    int pos = 0;
+    for (int i = 0; i < N; i++){
+        for (int j = 0; j < M; j ++) {
+            std::cout << "Value at (" << i << ", " << j << "): " << ptr[pos] << std::endl;
+            ptr[pos] = 1; 
+            pos++;
+        }
+    }
+    return 0;
+}
+
+PYBIND11_MODULE(MyLib, m) {
+    // optional module docstring
+    m.doc() = "pybind11 calculator plugin";
+
+    m.def("calc_trajectory", &calc_trajectory, "Calculates a trajectory for given target waypoints and timestamps.");
 }
