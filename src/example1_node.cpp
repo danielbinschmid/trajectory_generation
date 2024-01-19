@@ -85,6 +85,10 @@ VectorXd allocateTime(const MatrixXd &wayPs,
 
 enum OptType { JERK, SNAP };
 
+/**
+ * Needs to produce a file which contains the target trajectory
+ **/
+
 int main(int argc, char **argv)
 {
     // CONFIG ----
@@ -144,6 +148,13 @@ int main(int argc, char **argv)
     // -----------
     
     // LOG -------
+    std::cout << "Points: " << std::endl;
+    int nPoints = 100;
+
+    for (int i = 0; i < nPoints; i++) {
+        auto pos = minSnapTraj.getPos(i / nPoints);
+        std::cout << pos << std::endl;
+    }
     // -----------
     return 0;
 }
