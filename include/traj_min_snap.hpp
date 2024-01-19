@@ -121,7 +121,7 @@ namespace min_snap
         inline Eigen::Vector3d getPos(double t)
         {
             // Normalize the time
-            t /= duration;
+            t /= duration;            
             Eigen::Vector3d pos(0.0, 0.0, 0.0);
             double tn = 1.0;
             for (int i = TrajOrder; i >= 0; i--)

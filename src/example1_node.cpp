@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 {
     // CONFIG ----
     RandomRouteGenerator routeGen(Array3d(-16, -16, -16), Array3d(16, 16, 16));
-    int pieceNumber = 10;
+    int pieceNumber = 5;
     
     // Optimization type
     OptType optType = OptType::SNAP;
@@ -148,12 +148,16 @@ int main(int argc, char **argv)
     // -----------
     
     // LOG -------
-    std::cout << "Points: " << std::endl;
-    int nPoints = 100;
+    auto totalTime = minSnapTraj.getTotalDuration();
+    double nSteps = 100;
+    auto positions = minSnapTraj.getPositions();
+    std::cout << "Target waypoints" << std::endl << positions <<  std::endl;
 
-    for (int i = 0; i < nPoints; i++) {
-        auto pos = minSnapTraj.getPos(i / nPoints);
-        std::cout << pos << std::endl;
+
+    for (double i = 0; i <= nSteps; i++) {
+        std::cout << (i / nSteps) * totalTime << std::endl;
+        auto pos = minSnapTraj.getPos((i / nSteps) * totalTime);
+        std::cout << pos << std::endl << std::endl;
     }
     // -----------
     return 0;

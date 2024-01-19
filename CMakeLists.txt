@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.4...3.18)
 
-project(example1)
+project(MyLib)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -fPIC")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -Wextra -fPIC")
 
 find_package(Eigen3 REQUIRED)
 
@@ -13,5 +13,13 @@ include_directories(
     include
 )
 
+add_subdirectory(pybind11)
+pybind11_add_module(MyLib src/pywrap.cpp)
+
 add_executable(${PROJECT_NAME}_node src/example1_node.cpp)
 
+# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
+# define (VERSION_INFO) here.
+target_compile_definitions(${PROJECT_NAME} PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
+target_include_directories(${PROJECT_NAME} PRIVATE ${PYBIND11_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
