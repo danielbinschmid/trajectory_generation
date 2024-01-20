@@ -44,4 +44,4 @@ ax.set_zlabel("Z axis")
 ax.legend()
 
 # Display the plot
-plt.savefig("plot.png")
+plt.savefig("plot.pdf")
