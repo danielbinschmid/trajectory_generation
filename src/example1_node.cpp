@@ -1,5 +1,5 @@
-#include "traj_min_jerk.hpp"
-#include "traj_min_snap.hpp"
+#include "lib/traj_min_jerk.hpp"
+#include "lib/traj_min_snap.hpp"
 
 #include <chrono>
 
@@ -148,17 +148,6 @@ int main(int argc, char **argv)
     // -----------
     
     // LOG -------
-    auto totalTime = minSnapTraj.getTotalDuration();
-    double nSteps = 100;
-    auto positions = minSnapTraj.getPositions();
-    std::cout << "Target waypoints" << std::endl << positions <<  std::endl;
-
-
-    for (double i = 0; i <= nSteps; i++) {
-        std::cout << (i / nSteps) * totalTime << std::endl;
-        auto pos = minSnapTraj.getPos((i / nSteps) * totalTime);
-        std::cout << pos << std::endl << std::endl;
-    }
     // -----------
     return 0;
 }

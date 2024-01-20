@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 
-project(MyLib)
+project(trajectory_cpp)
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
 set(CMAKE_BUILD_TYPE "Release")
@@ -14,7 +14,7 @@ include_directories(
 )
 
 add_subdirectory(pybind11)
-pybind11_add_module(MyLib src/pywrap.cpp)
+pybind11_add_module(${PROJECT_NAME} src/pywrap.cpp src/traj_gen.cpp src/trajectory_wrapper.cpp)
 
 add_executable(${PROJECT_NAME}_node src/example1_node.cpp)
 
