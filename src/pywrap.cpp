@@ -70,7 +70,7 @@ int calc_trajectory(
 
     // setup +++++++
     Eigen::MatrixXd target_waypoints_mat = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(target_waypoints_buf, 3, n_target_points);
-    Eigen::Map<Eigen::Vector3d> target_timestamps_vec(target_timestamps_buf);
+    Eigen::VectorXd target_timestamps_vec = Eigen::Map<Eigen::VectorXd>(target_timestamps_buf, n_target_points - 1);
 
     min_jerk::Trajectory min_jerk_trajectory;
     min_snap::Trajectory min_snap_trajectory;
