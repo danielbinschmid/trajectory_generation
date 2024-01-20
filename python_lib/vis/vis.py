@@ -33,7 +33,7 @@ waypoint_color = "#ff7f0e"    # A contrasting shade of orange
 ax.scatter(x, y, z, color=trajectory_color, marker='.', s=20, label='Generated polynomial trajectory')
 
 # Plot the additional waypoints
-ax.scatter(reference_x, reference_y, reference_z, color=waypoint_color, marker='x', s=100, label='Additional Waypoints')
+ax.scatter(reference_x, reference_y, reference_z, color=waypoint_color, marker='x', s=100, label='Target waypoints')
 
 
 # Customization
