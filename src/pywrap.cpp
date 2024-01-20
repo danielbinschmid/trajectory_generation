@@ -5,7 +5,7 @@
 #include <iostream>
 #include "traj_gen.hpp"
 #include "trajectory_wrapper.hpp"
-#define LOG true
+#define LOG false
 namespace py = pybind11;
 constexpr auto byref = py::return_value_policy::reference_internal;
 
@@ -69,17 +69,17 @@ int calc_trajectory(
     // +++++++++++++
 
     // setup +++++++
-    Eigen::MatrixXd target_waypoints_mat = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(target_waypoints_buf, n_target_points, 3);
+    Eigen::MatrixXd target_waypoints_mat = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(target_waypoints_buf, 3, n_target_points);
     Eigen::Map<Eigen::Vector3d> target_timestamps_vec(target_timestamps_buf);
 
     min_jerk::Trajectory min_jerk_trajectory;
     min_snap::Trajectory min_snap_trajectory;
     // +++++++++++++
 
-    // gen +++++++++
     if (LOG) {
         std::cout << "Gen trajectory.." << std::endl;
     }
+    // gen +++++++++
     traj::gen_trajectory(
         target_waypoints_mat,
         target_timestamps_vec,

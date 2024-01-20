@@ -16,7 +16,7 @@ include_directories(
 add_subdirectory(pybind11)
 pybind11_add_module(${PROJECT_NAME} src/pywrap.cpp src/traj_gen.cpp src/trajectory_wrapper.cpp)
 
-add_executable(${PROJECT_NAME}_node src/example1_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/example1_node.cpp)
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
