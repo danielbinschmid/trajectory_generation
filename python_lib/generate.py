@@ -4,8 +4,9 @@ from typing import Tuple
 from utils.trajectory_query import TrajectoryQuery
 from utils.trajectory_factory import TrajectoryFactory
 
+
 def generate() -> TrajectoryQuery:
-    
+
     # CONFIG +++++
     LOG = False
     # ++++++++++++
@@ -16,10 +17,8 @@ def generate() -> TrajectoryQuery:
 
     # API ++++++++
     calc_trajectory(
-        query.t_waypoints, 
-        query.t_durations, 
-        query.r_waypoints, 
-        query.r_timestamps)
+        query.t_waypoints, query.t_durations, query.r_waypoints, query.r_timestamps
+    )
     # ++++++++++++
 
     # LOG ++++++++
@@ -31,7 +30,7 @@ def generate() -> TrajectoryQuery:
     # RET ++++++++
     return query
     # ++++++++++++
-    
+
 
 if __name__ == "__main__":
-    generate() 
+    generate()

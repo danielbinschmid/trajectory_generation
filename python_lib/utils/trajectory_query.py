@@ -1,16 +1,18 @@
 import numpy as np
 from typing import Optional
 
+
 class TrajectoryQuery:
     t_waypoints: np.ndarray
     t_durations: np.ndarray
     r_waypoints: np.ndarray
     r_timestamps: np.ndarray
 
-    def __init__(self, 
-                    t_waypoints: np.ndarray,
-                    t_durations: np.ndarray,
-                    t_discretization_level: int
+    def __init__(
+        self,
+        t_waypoints: np.ndarray,
+        t_durations: np.ndarray,
+        t_discretization_level: int,
     ) -> None:
         self.t_waypoints = t_waypoints
         self.t_durations = t_durations
